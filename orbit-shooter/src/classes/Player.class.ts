@@ -1,4 +1,5 @@
 import { c } from '../main';
+import { PositionType } from '../utils/Interfaces';
 
 class Player implements PlayerModel {
     private _position;
@@ -34,6 +35,5 @@ interface PlayerConstructor {
     color: string
 }
 
-type PositionType = { x: number, y: number }
 
 export default Player;
