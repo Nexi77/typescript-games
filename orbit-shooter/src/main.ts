@@ -52,7 +52,18 @@ const animate = () => {
     player.draw();
     hue++;
     projectiles.forEach(projectile => projectile.update());
-    enemies.forEach(enemy => enemy.update());
+    enemies.forEach((enemy, enemyIndex) => {
+        enemy.update()
+        projectiles.forEach((projectile, projectileIndex) => {
+            const dist = Math.hypot(projectile.position.x - enemy.position.x, projectile.position.y - enemy.position.y);
+            if (dist - enemy.radius - projectile.radius < 1) {
+                setTimeout(() => {
+                    enemies.splice(enemyIndex, 1);
+                    projectiles.splice(projectileIndex, 1);
+                }, 0)
+            }
+        })
+    });
 };
 
 addEventListener('click', (e) => {

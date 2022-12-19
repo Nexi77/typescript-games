@@ -17,6 +17,10 @@ class Enemy implements EnemyModel {
         return this._position;
     }
 
+    get radius() {
+        return this._radius;
+    }
+
     draw() {
         c.beginPath();
         c.arc(this._position.x, this._position.y, this._radius, 0, Math.PI * 2, false);
@@ -33,6 +37,7 @@ class Enemy implements EnemyModel {
 
 interface EnemyModel {
     position: PositionType,
+    radius: number,
     draw: () => void
     update: () => void
 }
