@@ -15,6 +15,10 @@ class Player implements PlayerModel {
         return this._position;
     }
 
+    get radius() {
+        return this._radius;
+    }
+
     draw() {
         c.beginPath();
         c.arc(this._position.x, this._position.y, this._radius, 0, Math.PI * 2, false);
@@ -26,6 +30,7 @@ class Player implements PlayerModel {
 
 interface PlayerModel {
     position: PositionType,
+    radius: number,
     draw: () => void
 }
 

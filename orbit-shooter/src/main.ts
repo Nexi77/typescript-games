@@ -2,6 +2,7 @@ import './assets/styles/style.scss'
 import Enemy from './classes/Enemy.class';
 import Player from './classes/Player.class';
 import Projectile from './classes/Projectile.class';
+import { arePointsColliding, calculateDist } from './utils/Helpers';
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 export const c = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -17,9 +18,11 @@ const player = new Player({ position: { x: canvasCenterHorizontal, y: canvasCent
 const projectiles: Projectile[] = [];
 const enemies: Enemy[] = [];
 let hue = 0;
+let animationId: number;
+let enemiesInterval: number;
 
 const spawnEnemies = () => {
-    setInterval(() => {
+    enemiesInterval = setInterval(() => {
         const radius = Math.random() * (30 - 5) + 5;
         const position = {
             x: 0,
@@ -46,23 +49,34 @@ const spawnEnemies = () => {
     }, 1000)
 };
 
+const removeOnProjectileCollide = (enemyIndex: number, projectileIndex: number) => {
+    setTimeout(() => {
+        enemies.splice(enemyIndex, 1);
+        projectiles.splice(projectileIndex, 1);
+    }, 0)
+}
+
+const gameStop = () => {
+    cancelAnimationFrame(animationId);
+    clearInterval(enemiesInterval);
+}
+
 const animate = () => {
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
     c.clearRect(0,0, canvas.width, canvas.height);
     player.draw();
-    hue++;
     projectiles.forEach(projectile => projectile.update());
+    hue++;
     enemies.forEach((enemy, enemyIndex) => {
-        enemy.update()
+        enemy.update();
+        const dist = calculateDist(player.position, enemy.position);
+        if (arePointsColliding(dist, enemy.radius, player.radius))
+            gameStop();
         projectiles.forEach((projectile, projectileIndex) => {
-            const dist = Math.hypot(projectile.position.x - enemy.position.x, projectile.position.y - enemy.position.y);
-            if (dist - enemy.radius - projectile.radius < 1) {
-                setTimeout(() => {
-                    enemies.splice(enemyIndex, 1);
-                    projectiles.splice(projectileIndex, 1);
-                }, 0)
-            }
-        })
+            const dist = calculateDist(projectile.position, enemy.position);
+            if (arePointsColliding(dist, enemy.radius, projectile.radius))
+                removeOnProjectileCollide(enemyIndex, projectileIndex);
+        });
     });
 };
 
@@ -81,5 +95,5 @@ addEventListener('click', (e) => {
 });
 
 animate();
-// spawnEnemies();
+spawnEnemies();
 
