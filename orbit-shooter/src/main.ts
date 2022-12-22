@@ -12,41 +12,38 @@ canvas.height = window.innerHeight;
 
 const canvasCenterHorizontal = canvas.width / 2;
 const canvasCenterVertical = canvas.height / 2;
+let frames = 0;
 
-const player = new Player({ position: { x: canvasCenterHorizontal, y: canvasCenterVertical }, color: 'blue', radius: 30 });
+const player = new Player({ position: { x: canvasCenterHorizontal, y: canvasCenterVertical }, color: 'white', radius: 10 });
 
 const projectiles: Projectile[] = [];
 const enemies: Enemy[] = [];
-let hue = 0;
 let animationId: number;
-let enemiesInterval: number;
 
 const spawnEnemies = () => {
-    enemiesInterval = setInterval(() => {
-        const radius = Math.random() * (30 - 5) + 5;
-        const position = {
-            x: 0,
-            y: 0
-        }
-        if(Math.random() < .5) {
-            position.x = Math.random() < .5 ? 0 - radius : canvas.width + radius;
-            position.y = Math.random() * canvas.height;
-        }
-        else {
-            position.x = Math.random() * canvas.width;
-            position.y = Math.random() < .5 ? 0 - radius : canvas.height + radius;
-        }
-        const color = `hsla(${hue},100%,50%,1)`
-        const angle = Math.atan2(
-            canvas.height / 2 -  position.y,
-            canvas.width / 2 - position.x
-        )
-        const velocity = { 
-            x: Math.cos(angle),
-            y: Math.sin(angle)
-        }
-        enemies.push(new Enemy({ position, radius, color, velocity }))
-    }, 1000)
+    const radius = Math.random() * (30 - 5) + 5;
+    const position = {
+        x: 0,
+        y: 0
+    }
+    if(Math.random() < .5) {
+        position.x = Math.random() < .5 ? 0 - radius : canvas.width + radius;
+        position.y = Math.random() * canvas.height;
+    }
+    else {
+        position.x = Math.random() * canvas.width;
+        position.y = Math.random() < .5 ? 0 - radius : canvas.height + radius;
+    }
+    const color = `hsla(${Math.random() * 360},50%,50%,1)`
+    const angle = Math.atan2(
+        canvas.height / 2 -  position.y,
+        canvas.width / 2 - position.x
+    )
+    const velocity = { 
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+    }
+    enemies.push(new Enemy({ position, radius, color, velocity }));
 };
 
 const removeOnProjectileCollide = (enemyIndex: number, projectileIndex: number) => {
@@ -56,17 +53,31 @@ const removeOnProjectileCollide = (enemyIndex: number, projectileIndex: number) 
     }, 0)
 }
 
+const isProjectileOffTheScreen = (projectile: Projectile) => {
+    return projectile.position.x + projectile.radius < 0 || 
+    projectile.position.x - projectile.radius > canvas.width ||
+    projectile.position.y + projectile.radius < 0 ||
+    projectile.position.y - projectile.radius > canvas.height
+}
+
 const gameStop = () => {
     cancelAnimationFrame(animationId);
-    clearInterval(enemiesInterval);
 }
 
 const animate = () => {
+    frames++;
     animationId = requestAnimationFrame(animate);
-    c.clearRect(0,0, canvas.width, canvas.height);
+    c.fillStyle = 'rgba(0,0,0,0.1)';
+    c.fillRect(0,0, canvas.width, canvas.height);
     player.draw();
-    projectiles.forEach(projectile => projectile.update());
-    hue++;
+    projectiles.forEach((projectile, index) => {
+        projectile.update();
+        if (isProjectileOffTheScreen(projectile)) {
+            setTimeout(() => {
+                projectiles.splice(index, 1);
+            }, 0)
+        }
+    });
     enemies.forEach((enemy, enemyIndex) => {
         enemy.update();
         const dist = calculateDist(player.position, enemy.position);
@@ -78,6 +89,7 @@ const animate = () => {
                 removeOnProjectileCollide(enemyIndex, projectileIndex);
         });
     });
+    if(frames % 60 === 0) spawnEnemies();
 };
 
 addEventListener('click', (e) => {
@@ -86,14 +98,13 @@ addEventListener('click', (e) => {
         e.clientX - canvas.width / 2
     )
     const velocity = { 
-        x: Math.cos(angle),
-        y: Math.sin(angle)
+        x: Math.cos(angle) * 5,
+        y: Math.sin(angle) * 5
     }
     projectiles.push(
-        new Projectile({ position: { x: canvasCenterHorizontal, y: canvasCenterVertical}, radius: 5, color: 'red', velocity})
+        new Projectile({ position: { x: canvasCenterHorizontal, y: canvasCenterVertical}, radius: 5, color: 'white', velocity})
     )
 });
 
 animate();
-spawnEnemies();
 
