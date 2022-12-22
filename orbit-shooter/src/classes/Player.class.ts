@@ -5,10 +5,12 @@ class Player implements PlayerModel {
     private _position;
     private _radius;
     private _color;
+    private _power;
     constructor({ position, color, radius } : PlayerConstructor) {
         this._position = position
         this._radius = radius;
         this._color = color;
+        this._power = 10;
     }
 
     get position() {
@@ -17,6 +19,10 @@ class Player implements PlayerModel {
 
     get radius() {
         return this._radius;
+    }
+
+    get power() {
+        return this._power;
     }
 
     draw() {
@@ -31,6 +37,7 @@ class Player implements PlayerModel {
 interface PlayerModel {
     position: PositionType,
     radius: number,
+    power: number,
     draw: () => void
 }
 

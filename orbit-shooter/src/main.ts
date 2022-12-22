@@ -3,6 +3,7 @@ import Enemy from './classes/Enemy.class';
 import Player from './classes/Player.class';
 import Projectile from './classes/Projectile.class';
 import { arePointsColliding, calculateDist } from './utils/Helpers';
+import gsap from 'gsap';
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 export const c = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -46,9 +47,10 @@ const spawnEnemies = () => {
     enemies.push(new Enemy({ position, radius, color, velocity }));
 };
 
-const removeOnProjectileCollide = (enemyIndex: number, projectileIndex: number) => {
+const removeOnProjectileCollide = (enemyIndex: number, projectileIndex: number, removeEnemy: boolean = true) => {
     setTimeout(() => {
-        enemies.splice(enemyIndex, 1);
+        if(removeEnemy)
+            enemies.splice(enemyIndex, 1);
         projectiles.splice(projectileIndex, 1);
     }, 0)
 }
@@ -85,8 +87,16 @@ const animate = () => {
             gameStop();
         projectiles.forEach((projectile, projectileIndex) => {
             const dist = calculateDist(projectile.position, enemy.position);
-            if (arePointsColliding(dist, enemy.radius, projectile.radius))
-                removeOnProjectileCollide(enemyIndex, projectileIndex);
+            if (arePointsColliding(dist, enemy.radius, projectile.radius)) {
+                if (enemy.radius - 10 > 5)
+                {
+                    gsap.to(enemy, {
+                        radius: enemy.radius - 10
+                    })
+                    removeOnProjectileCollide(enemyIndex, projectileIndex, false);
+                }
+                else removeOnProjectileCollide(enemyIndex, projectileIndex);
+            }
         });
     });
     if(frames % 60 === 0) spawnEnemies();
