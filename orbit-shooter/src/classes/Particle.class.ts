@@ -1,48 +1,58 @@
 import { c } from "../main";
 import { PositionType, VelocityType } from "../utils/Interfaces";
 
-class Projectile implements ProjectileModel {
+const friction = 0.99;
+
+class Particle implements ParticleModel {
     private _position;
     private _radius;
     private _color;
     private _velocity;
-    constructor({ position, radius, color, velocity }: ProjectileConstructor) {
+    private _alpha;
+    constructor({ position, radius, color, velocity }: ParticleConstructor) {
         this._position = position;
         this._radius = radius;
         this._color = color;
         this._velocity = velocity;
+        this._alpha = 1;
     }
 
     get position() {
         return this._position;
     }
 
-    get radius() {
-        return this._radius;
+    get alpha() {
+        return this._alpha;
     }
 
     draw() {
+        c.save();
+        c.globalAlpha = this._alpha;
         c.beginPath();
         c.arc(this._position.x, this._position.y, this._radius, 0, Math.PI * 2, false);
         c.fillStyle = this._color;
         c.fill();
+        c.restore();
     }
 
     update() {
+        this.draw();
+        this._velocity.x *= friction;
+        this._velocity.y *= friction;
         this._position.x += this._velocity.x;
         this._position.y += this._velocity.y;
-        this.draw();
+        this._alpha -= 0.01;
     }
 }
 
-interface ProjectileModel {
+interface ParticleModel {
     position: PositionType,
-    radius: number,
+    alpha: number,
     draw: () => void
-    update: () => void
+    update: () => void,
 }
 
-interface ProjectileConstructor {
+interface ParticleConstructor {
     position: PositionType
     radius: number,
     color: string,
@@ -50,4 +60,4 @@ interface ProjectileConstructor {
 }
 
 
-export default Projectile;
+export default Particle;

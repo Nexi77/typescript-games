@@ -17,6 +17,10 @@ class Enemy implements EnemyModel {
         return this._position;
     }
 
+    get color() {
+        return this._color;
+    }
+
     get radius() {
         return this._radius;
     }
@@ -33,8 +37,8 @@ class Enemy implements EnemyModel {
     }
 
     update() {
-        this.position.x += this._velocity.x;
-        this.position.y += this._velocity.y;
+        this._position.x += this._velocity.x;
+        this._position.y += this._velocity.y;
         this.draw();
     }
 }
@@ -42,6 +46,7 @@ class Enemy implements EnemyModel {
 interface EnemyModel {
     position: PositionType,
     radius: number,
+    color: string,
     draw: () => void
     update: () => void,
 }

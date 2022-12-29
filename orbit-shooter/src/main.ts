@@ -1,6 +1,7 @@
 import './assets/styles/style.scss'
 import Enemy from './classes/Enemy.class';
 import Player from './classes/Player.class';
+import Particle from './classes/Particle.class';
 import Projectile from './classes/Projectile.class';
 import { arePointsColliding, calculateDist } from './utils/Helpers';
 import gsap from 'gsap';
@@ -19,6 +20,7 @@ const player = new Player({ position: { x: canvasCenterHorizontal, y: canvasCent
 
 const projectiles: Projectile[] = [];
 const enemies: Enemy[] = [];
+const particles: Particle[] = [];
 let animationId: number;
 
 const spawnEnemies = () => {
@@ -62,6 +64,15 @@ const isProjectileOffTheScreen = (projectile: Projectile) => {
     projectile.position.y - projectile.radius > canvas.height
 }
 
+const createParticles = (enemy: Enemy, projectile: Projectile) => {
+    for (let i = 0; i < enemy.radius * 2; i++) {
+        particles.push(new Particle({ position: projectile.position, radius: Math.random() * 2, color: enemy.color, velocity: {
+            x: (Math.random() - 0.5) * (Math.random() * 2),
+            y: (Math.random() - 0.5) * (Math.random() * 2)
+        }}));
+    }
+}
+
 const gameStop = () => {
     cancelAnimationFrame(animationId);
 }
@@ -72,12 +83,16 @@ const animate = () => {
     c.fillStyle = 'rgba(0,0,0,0.1)';
     c.fillRect(0,0, canvas.width, canvas.height);
     player.draw();
+    particles.forEach((particle, idx) => {
+        if (particle.alpha <= 0) particles.splice(idx, 1);
+        else particle.update()
+    });
     projectiles.forEach((projectile, index) => {
         projectile.update();
         if (isProjectileOffTheScreen(projectile)) {
             setTimeout(() => {
                 projectiles.splice(index, 1);
-            }, 0)
+            }, 0);
         }
     });
     enemies.forEach((enemy, enemyIndex) => {
@@ -87,7 +102,9 @@ const animate = () => {
             gameStop();
         projectiles.forEach((projectile, projectileIndex) => {
             const dist = calculateDist(projectile.position, enemy.position);
+            // when projectiles touch the enemy
             if (arePointsColliding(dist, enemy.radius, projectile.radius)) {
+                createParticles(enemy, projectile);
                 if (enemy.radius - 10 > 5)
                 {
                     gsap.to(enemy, {
