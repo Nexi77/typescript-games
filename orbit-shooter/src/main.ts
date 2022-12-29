@@ -66,9 +66,9 @@ const isProjectileOffTheScreen = (projectile: Projectile) => {
 
 const createParticles = (enemy: Enemy, projectile: Projectile) => {
     for (let i = 0; i < enemy.radius * 2; i++) {
-        particles.push(new Particle({ position: projectile.position, radius: Math.random() * 2, color: enemy.color, velocity: {
-            x: (Math.random() - 0.5) * (Math.random() * 2),
-            y: (Math.random() - 0.5) * (Math.random() * 2)
+        particles.push(new Particle({ position: {...projectile.position}, radius: Math.random() * 2, color: enemy.color, velocity: {
+            x: (Math.random() - 0.5) * (Math.random() * 6),
+            y: (Math.random() - 0.5) * (Math.random() * 6)
         }}));
     }
 }
