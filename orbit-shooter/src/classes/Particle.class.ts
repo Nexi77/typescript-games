@@ -1,24 +1,13 @@
 import { c } from "../main";
-import { PositionType, VelocityType } from "../utils/Interfaces";
+import GameObject, { ObjectConstructor } from "./GameObject.class";
 
 const friction = 0.99;
 
-class Particle implements ParticleModel {
-    private _position;
-    private _radius;
-    private _color;
-    private _velocity;
+class Particle extends GameObject implements ParticleModel {
     private _alpha;
-    constructor({ position, radius, color, velocity }: ParticleConstructor) {
-        this._position = position;
-        this._radius = radius;
-        this._color = color;
-        this._velocity = velocity;
+    constructor({ position, radius, color, velocity }: ObjectConstructor) {
+        super({ position, radius, color, velocity })
         this._alpha = 1;
-    }
-
-    get position() {
-        return this._position;
     }
 
     get alpha() {
@@ -46,18 +35,7 @@ class Particle implements ParticleModel {
 }
 
 interface ParticleModel {
-    position: PositionType,
     alpha: number,
-    draw: () => void
-    update: () => void,
 }
-
-interface ParticleConstructor {
-    position: PositionType
-    radius: number,
-    color: string,
-    velocity: VelocityType
-}
-
 
 export default Particle;

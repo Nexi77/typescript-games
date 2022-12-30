@@ -4,8 +4,63 @@
     box-sizing: border-box;
 }
 
+body {
+    background-color: black;
+}
+
 #app {
     overflow: hidden;
     height: 100vh;
     width: 100vw;
+}
+
+.score-indicator {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    color: white;
+    user-select: none;
+    span {
+        font-weight: bold;
+        font-size: 1.5rem;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+}
+
+.start-game-modal {
+    display: flex;
+    z-index: 2;
+    flex-direction: column;
+    width: 80vw;
+    max-width: 600px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    align-items: center;
+    padding: 1.5em;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    #game-score {
+        font-weight: bold;
+        font-size: 2.5rem;
+        line-height: 0.8;
+    }
+    .game-start-button {
+        border: none;
+        padding: 1.2em 2em;
+        width: 100%;
+        margin-top: 1rem;
+        border-radius: 30px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: bold;
+        background-color: rgb(59 130 246);
+        cursor: pointer;
+        &:hover {
+            background-color: rgb(30, 109, 236);
+        }
+    }
 }

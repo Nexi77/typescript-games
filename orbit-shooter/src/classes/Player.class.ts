@@ -1,24 +1,12 @@
 import { c } from '../main';
 import { PositionType } from '../utils/Interfaces';
+import GameObject from './GameObject.class';
 
-class Player implements PlayerModel {
-    private _position;
-    private _radius;
-    private _color;
+class Player extends GameObject implements PlayerModel {
     private _power;
     constructor({ position, color, radius } : PlayerConstructor) {
-        this._position = position
-        this._radius = radius;
-        this._color = color;
+       super({ position, radius, color, velocity: { x: 0, y: 0 } })
         this._power = 10;
-    }
-
-    get position() {
-        return this._position;
-    }
-
-    get radius() {
-        return this._radius;
     }
 
     get power() {
@@ -32,13 +20,14 @@ class Player implements PlayerModel {
         c.fill();
     };
 
+    update() {
+        
+    }
+
 }
 
 interface PlayerModel {
-    position: PositionType,
-    radius: number,
     power: number,
-    draw: () => void
 }
 
 interface PlayerConstructor {
@@ -46,6 +35,5 @@ interface PlayerConstructor {
     radius: number,
     color: string
 }
-
 
 export default Player;

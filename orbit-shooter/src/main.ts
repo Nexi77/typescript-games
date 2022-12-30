@@ -8,6 +8,11 @@ import gsap from 'gsap';
 
 export const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 export const c = canvas.getContext("2d") as CanvasRenderingContext2D;
+const scoreElement = document.querySelector('#score-cell') as HTMLSpanElement;
+const startGameButton = document.querySelector('#game-start') as HTMLButtonElement;
+const startGameModal = document.querySelector('.start-game-modal') as HTMLDivElement;
+const finalGameScore = startGameModal.querySelector('#game-score') as HTMLSpanElement;
+let score = 0;
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -16,12 +21,35 @@ const canvasCenterHorizontal = canvas.width / 2;
 const canvasCenterVertical = canvas.height / 2;
 let frames = 0;
 
-const player = new Player({ position: { x: canvasCenterHorizontal, y: canvasCenterVertical }, color: 'white', radius: 10 });
-
-const projectiles: Projectile[] = [];
-const enemies: Enemy[] = [];
-const particles: Particle[] = [];
+let player = new Player({ position: { x: canvasCenterHorizontal, y: canvasCenterVertical }, color: 'white', radius: 10 });
+let projectiles: Projectile[] = [];
+let enemies: Enemy[] = [];
+let particles: Particle[] = [];
 let animationId: number;
+
+const init = () => {
+    score = 0;
+    scoreElement.textContent = String(score);
+    c.fillStyle = 'rgb(0,0,0)';
+    c.fillRect(0,0, canvas.width, canvas.height);
+    player = new Player({ position: { x: canvasCenterHorizontal, y: canvasCenterVertical }, color: 'white', radius: 10 });
+    projectiles = [];
+    enemies = [];
+    particles = [];
+}
+
+const gameStart = (e: MouseEvent) => {
+    init();
+    e.stopPropagation();
+    startGameModal.style.display = "none";
+    animate();
+}
+
+const gameStop = () => {
+    startGameModal.style.display = "flex";
+    finalGameScore.textContent = String(score);
+    cancelAnimationFrame(animationId);
+}
 
 const spawnEnemies = () => {
     const radius = Math.random() * (30 - 5) + 5;
@@ -50,11 +78,12 @@ const spawnEnemies = () => {
 };
 
 const removeOnProjectileCollide = (enemyIndex: number, projectileIndex: number, removeEnemy: boolean = true) => {
-    setTimeout(() => {
-        if(removeEnemy)
-            enemies.splice(enemyIndex, 1);
-        projectiles.splice(projectileIndex, 1);
-    }, 0)
+    if(removeEnemy){
+        enemies.splice(enemyIndex, 1);
+        score += 100;
+        scoreElement.textContent = String(score);
+    }
+    projectiles.splice(projectileIndex, 1);
 }
 
 const isProjectileOffTheScreen = (projectile: Projectile) => {
@@ -73,26 +102,20 @@ const createParticles = (enemy: Enemy, projectile: Projectile) => {
     }
 }
 
-const gameStop = () => {
-    cancelAnimationFrame(animationId);
-}
-
 const animate = () => {
     frames++;
     animationId = requestAnimationFrame(animate);
-    c.fillStyle = 'rgba(0,0,0,0.1)';
+    c.fillStyle = 'rgba(0,0,0, 0.1)';
     c.fillRect(0,0, canvas.width, canvas.height);
     player.draw();
-    particles.forEach((particle, idx) => {
+    particles.slice().forEach((particle, idx) => {
         if (particle.alpha <= 0) particles.splice(idx, 1);
         else particle.update()
     });
-    projectiles.forEach((projectile, index) => {
+    projectiles.slice().forEach((projectile, index) => {
         projectile.update();
         if (isProjectileOffTheScreen(projectile)) {
-            setTimeout(() => {
-                projectiles.splice(index, 1);
-            }, 0);
+            projectiles.splice(index, 1);
         }
     });
     enemies.forEach((enemy, enemyIndex) => {
@@ -133,5 +156,5 @@ addEventListener('click', (e) => {
     )
 });
 
-animate();
+startGameButton.addEventListener('click', gameStart);
 
